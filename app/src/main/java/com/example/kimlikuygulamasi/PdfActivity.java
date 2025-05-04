@@ -16,12 +16,12 @@ import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import java.io.File;
@@ -45,12 +45,10 @@ public class PdfActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf);
 
-        // UI elemanlarını tanımla
         Button btnYazdir = findViewById(R.id.btn_pdf_yazdir);
         Button btnPdfKaydet = findViewById(R.id.btn_pdf_kaydet);
         Button btnAnasayfayaDon = findViewById(R.id.btn_anasayfaya_don);
 
-        // FormActivity'den gelen verileri al
         Intent intent = getIntent();
         if (intent != null) {
             adSoyad = intent.getStringExtra("ad_soyad");
@@ -62,33 +60,25 @@ public class PdfActivity extends AppCompatActivity {
             kimlikArkaUriString = intent.getStringExtra("kimlik_arka_uri");
         }
 
-        // İzinleri kontrol et
         checkPermissions();
-
-        // PDF oluştur
         createPdf();
 
-        // Yazdır butonu tıklama olayı
         btnYazdir.setOnClickListener(v -> {
             if (pdfDosyasi != null && pdfDosyasi.exists()) {
                 printPdf();
             } else {
-                Toast.makeText(PdfActivity.this, "PDF dosyası bulunamadı, lütfen önce kaydedin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PDF dosyası bulunamadı", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // PDF Kaydet butonu tıklama olayı
         btnPdfKaydet.setOnClickListener(v -> {
             if (pdfDosyasi != null && pdfDosyasi.exists()) {
-                Toast.makeText(PdfActivity.this, "PDF dosyası zaten kaydedildi: " + pdfDosyasi.getAbsolutePath(), Toast.LENGTH_LONG).show();
                 openPdf();
             } else {
-                createPdf();
-                Toast.makeText(PdfActivity.this, "PDF oluşturuldu ve kaydedildi", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PDF dosyası bulunamadı", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Ana sayfaya dön butonu
         btnAnasayfayaDon.setOnClickListener(v -> {
             Intent intent1 = new Intent(PdfActivity.this, MainActivity.class);
             intent1.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -103,42 +93,32 @@ public class PdfActivity extends AppCompatActivity {
     }
 
     private void createPdf() {
-        // PDF dokümantasyonu oluştur
         PdfDocument document = new PdfDocument();
-
-        // A4 sayfa boyutu
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
         PdfDocument.Page page = document.startPage(pageInfo);
 
         Canvas canvas = page.getCanvas();
         Paint paint = new Paint();
 
-        // Başlık
         paint.setTextSize(16);
         canvas.drawText("KİMLİK KAYIT FORMU", 250, 50, paint);
 
-        // Kimlik fotoğrafları
         if (kimlikOnUriString != null && kimlikArkaUriString != null) {
             try {
-                Bitmap kimlikOn = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(kimlikOnUriString)));
-                Bitmap kimlikArka = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(kimlikArkaUriString)));
+                Bitmap kimlikOnBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(kimlikOnUriString)));
+                Bitmap kimlikArkaBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(kimlikArkaUriString)));
 
-                // Resimlerin boyutunu ayarla
-                kimlikOn = Bitmap.createScaledBitmap(kimlikOn, 250, 150, false);
-                kimlikArka = Bitmap.createScaledBitmap(kimlikArka, 250, 150, false);
-
-                // Resimleri çiz
-                canvas.drawBitmap(kimlikOn, 50, 100, null);
-                canvas.drawBitmap(kimlikArka, 320, 100, null);
-
-            } catch (Exception e) {
-                String errorMsg = "Kimlik fotoğrafları yüklenirken hata: " + e.getMessage();
-                Log.e(TAG, errorMsg, e);
-                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+                if (kimlikOnBitmap != null) {
+                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikOnBitmap, 200, 120, false), 50, 100, paint);
+                }
+                if (kimlikArkaBitmap != null) {
+                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikArkaBitmap, 200, 120, false), 300, 100, paint);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Kimlik fotoğrafları yüklenirken hata oluştu: " + e.getMessage(), e);
             }
         }
 
-        // Kişisel bilgiler
         paint.setTextSize(14);
         int y = 300;
 
@@ -154,29 +134,26 @@ public class PdfActivity extends AppCompatActivity {
         canvas.drawText("Telefon: " + telefon, 50, y, paint);
         y += 30;
 
-        // Adres için satır satır yazdırma
         canvas.drawText("Adres:", 50, y, paint);
         y += 20;
 
-        // Adres metnini 50 karakterden sonra böl
         String[] adresLines = formatText(adres);
         for (String line : adresLines) {
             canvas.drawText(line, 70, y, paint);
             y += 20;
         }
 
-        // Tarih ekle
         String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         canvas.drawText("Tarih: " + currentDate, 50, y + 40, paint);
 
         document.finishPage(page);
 
-        // PDF dosyasını kaydet
         File pdfFolder = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "KimlikUygulamasi");
         if (!pdfFolder.exists()) {
             boolean dirCreated = pdfFolder.mkdirs();
             if (!dirCreated) {
-                Log.w(TAG, "PDF klasörü oluşturulamadı");
+                Log.e(TAG, "PDF klasörü oluşturulamadı");
+                return;
             }
         }
 
@@ -184,13 +161,13 @@ public class PdfActivity extends AppCompatActivity {
         pdfDosyasi = new File(pdfFolder, "Kimlik_" + timeStamp + ".pdf");
 
         try {
-            document.writeTo(new FileOutputStream(pdfDosyasi));
-            Toast.makeText(this, "PDF oluşturuldu", Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "PDF başarıyla oluşturuldu: " + pdfDosyasi.getAbsolutePath());
+            FileOutputStream outputStream = new FileOutputStream(pdfDosyasi);
+            document.writeTo(outputStream);
+            outputStream.close();
+            Log.d(TAG, "PDF başarıyla kaydedildi: " + pdfDosyasi.getAbsolutePath());
         } catch (IOException e) {
-            String errorMsg = "PDF oluşturulurken hata: " + e.getMessage();
-            Log.e(TAG, errorMsg, e);
-            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "PDF kaydedilirken hata oluştu: " + e.getMessage(), e);
+            Toast.makeText(this, "PDF kaydedilirken hata oluştu", Toast.LENGTH_SHORT).show();
         }
 
         document.close();
@@ -198,11 +175,11 @@ public class PdfActivity extends AppCompatActivity {
 
     private String[] formatText(String text) {
         if (text == null) {
-            return new String[] { "" };
+            return new String[]{""};
         }
 
         if (text.length() <= 70) {
-            return new String[] { text };
+            return new String[]{text};
         }
 
         int numLines = (int) Math.ceil((double) text.length() / 70);
@@ -221,19 +198,11 @@ public class PdfActivity extends AppCompatActivity {
         PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
 
         try {
-            FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", pdfDosyasi);
-
             PrintDocumentAdapter printAdapter = new PdfDocumentAdapter(this, pdfDosyasi.getAbsolutePath());
-
-            String jobName = getString(R.string.app_name) + " Kimlik Kayıt";
-
-            printManager.print(jobName, printAdapter, new PrintAttributes.Builder().build());
-            Log.i(TAG, "PDF yazdırma işi başlatıldı");
-
+            printManager.print("Kimlik PDF", printAdapter, null);
         } catch (Exception e) {
-            String errorMsg = "Yazdırma hatası: " + e.getMessage();
-            Log.e(TAG, errorMsg, e);
-            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "PDF yazdırma hatası: " + e.getMessage(), e);
+            Toast.makeText(this, "PDF yazdırma hatası", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -247,10 +216,8 @@ public class PdfActivity extends AppCompatActivity {
 
         try {
             startActivity(intent);
-            Log.i(TAG, "PDF gösterici açıldı");
         } catch (Exception e) {
-            String errorMsg = "PDF gösterici uygulaması bulunamadı: " + e.getMessage();
-            Log.e(TAG, errorMsg, e);
+            Log.e(TAG, "PDF gösterici uygulaması bulunamadı: " + e.getMessage(), e);
             Toast.makeText(this, "PDF gösterici uygulaması bulunamadı", Toast.LENGTH_SHORT).show();
         }
     }
@@ -263,9 +230,8 @@ public class PdfActivity extends AppCompatActivity {
                 Log.i(TAG, "Depolama izni verildi");
                 createPdf();
             } else {
-                String errorMsg = "PDF oluşturmak için depolama iznine ihtiyaç var";
-                Log.e(TAG, errorMsg);
-                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "PDF oluşturmak için depolama iznine ihtiyaç var");
+                Toast.makeText(this, "PDF oluşturmak için depolama iznine ihtiyaç var", Toast.LENGTH_SHORT).show();
             }
         }
     }

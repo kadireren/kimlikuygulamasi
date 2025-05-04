@@ -12,6 +12,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -36,8 +38,52 @@ public class MainActivity extends AppCompatActivity {
     private String kimlikOnPath;
     private String kimlikArkaPath;
 
-    private static final int REQUEST_IMAGE_CAPTURE_FRONT = 1;
-    private static final int REQUEST_IMAGE_CAPTURE_BACK = 2;
+    // ActivityResultLauncher için tanımlama
+    private final ActivityResultLauncher<Intent> frontCardLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    processImageResult(result.getData().getStringExtra("image_path"), true);
+                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                    Toast.makeText(this, R.string.camera_cancelled, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, R.string.error_camera_generic, Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<Intent> backCardLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    processImageResult(result.getData().getStringExtra("image_path"), false);
+                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                    Toast.makeText(this, R.string.camera_cancelled, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, R.string.error_camera_generic, Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<String[]> requestMultiplePermissions = registerForActivityResult(
+            new ActivityResultContracts.RequestMultiplePermissions(),
+            permissions -> {
+                boolean allGranted = true;
+                for (Boolean isGranted : permissions.values()) {
+                    if (!isGranted) {
+                        allGranted = false;
+                        break;
+                    }
+                }
+
+                if (allGranted) {
+                    enableCameraFeatures();
+                } else {
+                    Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         if (allPermissionsGranted()) {
             enableCameraFeatures();
         } else {
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+            requestMultiplePermissions.launch(REQUIRED_PERMISSIONS);
         }
     }
 
@@ -68,42 +114,22 @@ public class MainActivity extends AppCompatActivity {
         btnKimlikOn.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, IdCardCameraActivity.class);
             intent.putExtra("is_front", true);
-            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE_FRONT);
+            frontCardLauncher.launch(intent);
         });
 
         btnKimlikArka.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, IdCardCameraActivity.class);
             intent.putExtra("is_front", false);
-            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE_BACK);
+            backCardLauncher.launch(intent);
         });
 
         btnFormaGec.setOnClickListener(v -> navigateToForm());
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK && data != null) {
-            String originalPath = data.getStringExtra("image_path");
-            boolean isFront = (requestCode == REQUEST_IMAGE_CAPTURE_FRONT);
-
-            if (originalPath != null) {
-                processImageResult(originalPath, isFront);
-            } else {
-                Toast.makeText(this, "Resim yolu alınamadı", Toast.LENGTH_SHORT).show();
-            }
-        } else if (resultCode == RESULT_CANCELED) {
-            Toast.makeText(this, "Kamera işlemi iptal edildi", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Kamera hatası", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void processImageResult(String originalPath, boolean isFront) {
         Bitmap originalBitmap = BitmapFactory.decodeFile(originalPath);
         if (originalBitmap != null) {
-            Log.d(TAG, "Orijinal bitmap yüklendi: " + originalPath);
+            Log.d(TAG, getString(R.string.photo_saved) + " " + originalPath);
 
             // Basit merkezi kırpma işlemi uygula
             Bitmap croppedBitmap = autoCropIdCard(originalBitmap);
@@ -114,28 +140,28 @@ public class MainActivity extends AppCompatActivity {
                 if (croppedImagePath != null) {
                     if (isFront) {
                         kimlikOnPath = croppedImagePath;
-                        btnKimlikOn.setText("Kimlik Ön Yüzü Çekildi");
-                        Toast.makeText(this, "Kimlik ön yüzü kaydedildi", Toast.LENGTH_SHORT).show();
+                        btnKimlikOn.setText(R.string.kimlik_on_button_text);
+                        Toast.makeText(this, R.string.kimlik_on_saved, Toast.LENGTH_SHORT).show();
                     } else {
                         kimlikArkaPath = croppedImagePath;
-                        btnKimlikArka.setText("Kimlik Arka Yüzü Çekildi");
-                        Toast.makeText(this, "Kimlik arka yüzü kaydedildi", Toast.LENGTH_SHORT).show();
+                        btnKimlikArka.setText(R.string.kimlik_arka_button_text);
+                        Toast.makeText(this, R.string.kimlik_arka_saved, Toast.LENGTH_SHORT).show();
                     }
                     checkAndEnableFormButton();
                 } else {
-                    Toast.makeText(this, "Kırpılmış görüntü kaydedilemedi", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.error_saving_cropped_image, Toast.LENGTH_SHORT).show();
                 }
 
                 if (croppedBitmap != originalBitmap) {
                     croppedBitmap.recycle();
                 }
             } else {
-                Toast.makeText(this, "Kırpma işlemi başarısız oldu", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.crop_error_generic, Toast.LENGTH_SHORT).show();
             }
 
             originalBitmap.recycle();
         } else {
-            Toast.makeText(this, "Resim yüklenemedi", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_loading_image, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -155,14 +181,14 @@ public class MainActivity extends AppCompatActivity {
             // Kırpma sınırlarının geçerli olduğundan emin ol
             if (left < 0 || top < 0 || targetWidth <= 0 || targetHeight <= 0 ||
                     left + targetWidth > originalWidth || top + targetHeight > originalHeight) {
-                Log.e(TAG, "Geçersiz kırpma boyutları");
+                Log.e(TAG, getString(R.string.crop_error_generic));
                 return originalBitmap;
             }
 
             // Bitmap'in merkez kısmını kırp
             return Bitmap.createBitmap(originalBitmap, left, top, targetWidth, targetHeight);
         } catch (Exception e) {
-            Log.e(TAG, "Bitmap kırpma hatası: " + e.getMessage(), e);
+            Log.e(TAG, getString(R.string.crop_error_generic) + " " + e.getMessage(), e);
             return originalBitmap;
         }
     }
@@ -174,21 +200,21 @@ public class MainActivity extends AppCompatActivity {
             String imageFileName = (isFront ? "CROPPED_FRONT_" : "CROPPED_BACK_") + timeStamp + "_";
             File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
             if (storageDir == null) {
-                Log.e(TAG, "Harici depolama alanı (Pictures) bulunamadı.");
+                Log.e(TAG, getString(R.string.file_creation_error));
                 return null;
             }
             photoFile = File.createTempFile(imageFileName, ".jpg", storageDir);
 
             try (FileOutputStream out = new FileOutputStream(photoFile)) {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                Log.d(TAG, "Kırpılmış fotoğraf kaydedildi: " + photoFile.getAbsolutePath());
+                Log.d(TAG, getString(R.string.image_saved_successfully) + " " + photoFile.getAbsolutePath());
                 return photoFile.getAbsolutePath();
             } catch (IOException e) {
-                Log.e(TAG, "Kırpılmış fotoğraf dosyaya yazılamadı: " + e.getMessage(), e);
+                Log.e(TAG, getString(R.string.error_saving_image_file) + " " + e.getMessage(), e);
                 return null;
             }
         } catch (IOException ex) {
-            Log.e(TAG, "Kırpılmış fotoğraf dosyası oluşturulamadı: " + ex.getMessage(), ex);
+            Log.e(TAG, getString(R.string.file_creation_error) + " " + ex.getMessage(), ex);
             return null;
         }
     }
@@ -200,14 +226,14 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("kimlik_arka_path", kimlikArkaPath);
             startActivity(intent);
         } else {
-            Toast.makeText(this, "Lütfen kimlik kartının her iki yüzünü de çekin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.form_error, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void enableCameraFeatures() {
         btnKimlikOn.setEnabled(true);
         btnKimlikArka.setEnabled(true);
-        Log.d(TAG, "Kamera izinleri alındı");
+        Log.d(TAG, getString(R.string.camera_permission_granted));
     }
 
     private void checkAndEnableFormButton() {
@@ -221,18 +247,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                enableCameraFeatures();
-            } else {
-                Toast.makeText(this, "Kamera izni reddedildi", Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }
     }
 }

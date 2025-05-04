@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Kimlik Uygulaması</string>
-    <!-- MainActivity -->
 
-    <string name="kimlik_uygulamas">Kimlik Uygulaması</string>
+    <!-- MainActivity -->
+    <string name="kimlik_uygulamasi">Kimlik Uygulaması</string>
     <string name="kimlik_on_saved">Kimlik ön yüzü kaydedildi</string>
     <string name="kimlik_arka_saved">Kimlik arka yüzü kaydedildi</string>
     <string name="kimlik_on_button_text">Kimlik Ön Yüzü (✓)</string>
@@ -16,7 +17,17 @@
     <string name="btn_id_front">Kimlik Ön Yüzü</string>
     <string name="btn_id_back">Kimlik Arka Yüzü</string>
     <string name="btn_goto_form">Forma Geç</string>
-
+    <string name="custom_camera_button">Kılavuzlu Kamera ile Çek (Önerilen)</string>
+    <string name="previous_captures">Önceki Çekimler</string>
+    <string name="error_getting_image_path">Resim yolu alınamadı</string>
+    <string name="camera_cancelled">Kamera işlemi iptal edildi</string>
+    <string name="error_camera_generic">Kamera hatası oluştu</string>
+    <string name="error_saving_cropped_image">Kırpılmış görüntü kaydedilemedi</string>
+    <string name="error_loading_image">Resim yüklenemedi</string>
+    <string name="form_validation_error">Lütfen tüm alanları doldurun</string>
+    <string name="crop_error_generic">Resim kırpılırken bir hata oluştu.</string>
+    <string name="crop_no_object_detected">Kimlik kartı algılanamadı, orijinal resim kullanılıyor.</string>
+    <string name="processing_image">Resim işleniyor...</string>
 
     <!-- Form Activity -->
     <string name="form_title">Kişisel Bilgiler Formu</string>
@@ -45,7 +56,7 @@
     <string name="camera_preview_configured">Kamera önizleme oturumu yapılandırıldı</string>
     <string name="error_preview_configuration">Kamera önizleme oturumu yapılandırılamadı</string>
     <string name="error_preview_creation">Kamera önizleme hatası:</string>
-    <string name="error_device_null">Kamera cihazı başlatılmadı</string>
+    <string name="error_device_null">Kamera cihazı bağlatılmadı</string>
     <string name="camera_preview_updated">Kamera önizleme güncellendi</string>
     <string name="error_preview_update">Kamera önizleme güncelleme hatası:</string>
     <string name="error_saving_image">Fotoğraf kaydedilirken hata:</string>
@@ -61,20 +72,15 @@
     <string name="background_thread_started">Arkaplan thread\'i başlatıldı</string>
     <string name="background_thread_stopped">Arkaplan thread\'i durduruldu</string>
     <string name="error_stopping_background">Arkaplan thread\'i durdurulurken hata:</string>
+    <string name="foto_raf_cek">Fotoğraf Çek</string>
     <string name="foto_raf_ek">Fotoğraf Çek</string>
+
     <!-- PDFActivity -->
+    <string name="pdf_olusturuldu">PDF Oluşturuldu</string>
     <string name="pdf_olu_turuldu">PDF Oluşturuldu</string>
     <string name="pdf_kaydet">PDF Kaydet</string>
+    <string name="ana_sayfaya_don">Ana Sayfaya Dön</string>
     <string name="ana_sayfaya_d_n">Ana Sayfaya Dön</string>
+    <string name="yazdir">Yazdır</string>
     <string name="yazd_r">Yazdır</string>
-    <!-- MainActivity için eksik string kaynakları -->
-    <string name="error_getting_image_path">Resim yolu alınamadı</string>
-    <string name="camera_cancelled">Kamera işlemi iptal edildi</string>
-    <string name="error_camera_generic">Kamera hatası oluştu</string>
-    <string name="error_saving_cropped_image">Kırpılmış resim kaydedilemedi</string>
-    <string name="error_loading_image">Resim yüklenemedi</string>
-    <string name="form_validation_error">Lütfen tüm alanları doldurun</string>
-    <string name="crop_error_generic">Resim kırpılırken bir hata oluştu.</string>
-    <string name="crop_no_object_detected">Kimlik kartı algılanamadı, orijinal resim kullanılıyor.</string>
-    <string name="processing_image">Resim işleniyor...</string>
 </resources>

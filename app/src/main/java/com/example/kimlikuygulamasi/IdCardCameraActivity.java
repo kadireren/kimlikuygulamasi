@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.*;
@@ -25,9 +23,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
@@ -36,14 +35,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class IdCardCameraActivity extends AppCompatActivity {
-    private static final int CAMERA_PERMISSION_CODE = 100;
     private static final String TAG = "IdCardCameraActivity";
 
     private TextureView textureView;
@@ -57,6 +54,39 @@ public class IdCardCameraActivity extends AppCompatActivity {
     private HandlerThread backgroundThread;
     private boolean isFront;
 
+    // TextureView.SurfaceTextureListener'ı sınıfın kendisi üzerinden implemente edelim
+    // bu şekilde field olarak tutmayalım
+
+    private final ActivityResultLauncher<String[]> requestCameraPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    permissions -> {
+                        boolean allGranted = true;
+                        for (Boolean isGranted : permissions.values()) {
+                            if (!isGranted) {
+                                allGranted = false;
+                                break;
+                            }
+                        }
+
+                        if (allGranted) {
+                            if (textureView != null && textureView.isAvailable()) {
+                                openCamera();
+                            } else if (textureView != null) {
+                                // setOnSurfaceTextureAvailableListener metodu ile event tanımlayalım
+                                setupTextureViewListener();
+                            } else {
+                                Log.e(TAG, "TextureView bulunamadı!");
+                                Toast.makeText(this, "Kamera görüntüsü hazırlanamadı", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        } else {
+                            String errorMsg = getString(R.string.camera_permission_denied);
+                            Log.e(TAG, errorMsg);
+                            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,64 +94,85 @@ public class IdCardCameraActivity extends AppCompatActivity {
 
         isFront = getIntent().getBooleanExtra("is_front", true);
 
-        TextView instructionText = findViewById(R.id.instruction_text);
-        Button captureButton = findViewById(R.id.btn_capture);
-        textureView = findViewById(R.id.camera_preview);
+        // View'ları initialize et
+        initializeViews();
 
-        textureView.setSurfaceTextureListener(textureListener);
-
-        instructionText.setText(isFront ? getString(R.string.kimlik_on_instruction) : getString(R.string.kimlik_arka_instruction));
-
+        // İzinleri kontrol et
         checkCameraPermission();
-
-        captureButton.setOnClickListener(v -> takePicture());
     }
 
-    private final TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
-        @Override
-        public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
-            openCamera();
+    private void setupTextureViewListener() {
+        try {
+            if (textureView == null) return;
+
+            textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                @Override
+                public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
+                    openCamera();
+                }
+
+                @Override
+                public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {}
+
+                @Override
+                public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
+                    return false;
+                }
+
+                @Override
+                public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {}
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "TextureView listener ayarlanırken hata: " + e.getMessage());
         }
+    }
 
-        @Override
-        public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {}
+    private void initializeViews() {
+        try {
+            TextView instructionText = findViewById(R.id.instruction_text);
+            if (instructionText != null) {
+                instructionText.setText(isFront ?
+                        getString(R.string.kimlik_on_instruction) :
+                        getString(R.string.kimlik_arka_instruction));
+            }
 
-        @Override
-        public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
-            return false;
+            Button captureButton = findViewById(R.id.btn_capture);
+            if (captureButton != null) {
+                captureButton.setOnClickListener(v -> takePicture());
+            }
+
+            textureView = findViewById(R.id.camera_preview);
+            if (textureView != null) {
+                setupTextureViewListener();
+            } else {
+                Log.e(TAG, "camera_preview TextureView bulunamadı!");
+                Toast.makeText(this, "Kamera arayüzü hazırlanamadı", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "View'lar başlatılırken hata: " + e.getMessage(), e);
+            Toast.makeText(this, "Arayüz öğeleri yüklenirken hata oluştu", Toast.LENGTH_SHORT).show();
+            finish();
         }
-
-        @Override
-        public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {}
-    };
+    }
 
     private void checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (textureView.isAvailable()) {
-                    openCamera();
-                } else {
-                    textureView.setSurfaceTextureListener(textureListener);
-                }
-            } else {
-                String errorMsg = getString(R.string.camera_permission_denied);
-                Log.e(TAG, errorMsg);
-                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
-                finish();
+            requestCameraPermission.launch(new String[]{Manifest.permission.CAMERA});
+        } else if (textureView != null) {
+            if (textureView.isAvailable()) {
+                openCamera();
             }
         }
     }
 
     @SuppressLint("MissingPermission")
     private void openCamera() {
+        if (textureView == null) {
+            Log.e(TAG, "TextureView null, kamera açılamıyor!");
+            return;
+        }
+
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = null;
@@ -170,6 +221,10 @@ public class IdCardCameraActivity extends AppCompatActivity {
             Log.e(TAG, errorMsg, e);
             Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
             finish();
+        } catch (Exception e) {
+            Log.e(TAG, "Kamera açılırken beklenmeyen hata: " + e.getMessage(), e);
+            Toast.makeText(this, "Kamera başlatılırken hata oluştu", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -201,7 +256,10 @@ public class IdCardCameraActivity extends AppCompatActivity {
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
             Log.d(TAG, getString(R.string.camera_disconnected));
-            cameraDevice.close();
+            if (cameraDevice != null) {
+                cameraDevice.close();
+                cameraDevice = null;
+            }
         }
 
         @Override
@@ -218,6 +276,11 @@ public class IdCardCameraActivity extends AppCompatActivity {
 
     private void createCameraPreview() {
         try {
+            if (textureView == null) {
+                Log.e(TAG, "TextureView null, önizleme oluşturulamıyor!");
+                return;
+            }
+
             SurfaceTexture texture = textureView.getSurfaceTexture();
             if (texture == null || imageDimension == null) {
                 Log.e(TAG, getString(R.string.error_preview_texture));
@@ -226,6 +289,11 @@ public class IdCardCameraActivity extends AppCompatActivity {
 
             texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
+
+            if (cameraDevice == null) {
+                Log.e(TAG, "CameraDevice null, capture request oluşturulamıyor!");
+                return;
+            }
 
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(surface);
@@ -249,11 +317,14 @@ public class IdCardCameraActivity extends AppCompatActivity {
             String errorMsg = getString(R.string.error_preview_creation) + e.getMessage();
             Log.e(TAG, errorMsg, e);
             Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e(TAG, "Kamera önizlemesi oluşturulurken beklenmeyen hata: " + e.getMessage(), e);
+            Toast.makeText(this, "Kamera önizlemesi hazırlanamadı", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void updatePreview() {
-        if (cameraDevice == null) {
+        if (cameraDevice == null || captureRequestBuilder == null || cameraCaptureSession == null) {
             Log.e(TAG, getString(R.string.error_device_null));
             return;
         }
@@ -294,11 +365,13 @@ public class IdCardCameraActivity extends AppCompatActivity {
                 height = jpegSizes[0].getHeight();
             }
 
-            // Değişken adı değiştirildi: reader -> stillImageReader
             ImageReader stillImageReader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
             List<Surface> outputSurfaces = new ArrayList<>(2);
             outputSurfaces.add(stillImageReader.getSurface());
-            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
+
+            if (textureView != null && textureView.getSurfaceTexture() != null) {
+                outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
+            }
 
             final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(stillImageReader.getSurface());
@@ -308,10 +381,12 @@ public class IdCardCameraActivity extends AppCompatActivity {
             final File file = createImageFile();
             ImageReader.OnImageAvailableListener readerListener = imageReader -> {
                 try (Image image = imageReader.acquireLatestImage()) {
-                    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                    byte[] bytes = new byte[buffer.capacity()];
-                    buffer.get(bytes);
-                    saveImageToFile(bytes, file);
+                    if (image != null) {
+                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                        byte[] bytes = new byte[buffer.capacity()];
+                        buffer.get(bytes);
+                        saveImageToFile(bytes, file);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, getString(R.string.error_saving_image) + e.getMessage(), e);
                 }
@@ -355,6 +430,9 @@ public class IdCardCameraActivity extends AppCompatActivity {
 
         } catch (CameraAccessException | IOException e) {
             Log.e(TAG, getString(R.string.error_taking_picture) + e.getMessage(), e);
+        } catch (Exception e) {
+            Log.e(TAG, "Fotoğraf çekerken beklenmeyen hata: " + e.getMessage(), e);
+            Toast.makeText(this, "Fotoğraf çekilemedi. Tekrar deneyiniz.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -407,10 +485,12 @@ public class IdCardCameraActivity extends AppCompatActivity {
         super.onResume();
         Log.d(TAG, "onResume");
         startBackgroundThread();
-        if (textureView.isAvailable()) {
-            openCamera();
-        } else {
-            textureView.setSurfaceTextureListener(textureListener);
+        if (textureView != null) {
+            if (textureView.isAvailable()) {
+                openCamera();
+            } else {
+                setupTextureViewListener();
+            }
         }
     }
 
@@ -425,16 +505,31 @@ public class IdCardCameraActivity extends AppCompatActivity {
     private void closeCamera() {
         Log.d(TAG, getString(R.string.closing_camera));
         if (cameraCaptureSession != null) {
-            cameraCaptureSession.close();
-            cameraCaptureSession = null;
+            try {
+                cameraCaptureSession.close();
+            } catch (Exception e) {
+                Log.e(TAG, "Kamera oturumu kapatılırken hata: " + e.getMessage(), e);
+            } finally {
+                cameraCaptureSession = null;
+            }
         }
         if (cameraDevice != null) {
-            cameraDevice.close();
-            cameraDevice = null;
+            try {
+                cameraDevice.close();
+            } catch (Exception e) {
+                Log.e(TAG, "Kamera cihazı kapatılırken hata: " + e.getMessage(), e);
+            } finally {
+                cameraDevice = null;
+            }
         }
         if (imageReader != null) {
-            imageReader.close();
-            imageReader = null;
+            try {
+                imageReader.close();
+            } catch (Exception e) {
+                Log.e(TAG, "ImageReader kapatılırken hata: " + e.getMessage(), e);
+            } finally {
+                imageReader = null;
+            }
         }
     }
 
@@ -447,9 +542,9 @@ public class IdCardCameraActivity extends AppCompatActivity {
 
     private void stopBackgroundThread() {
         if (backgroundThread != null) {
-            Log.d(TAG, getString(R.string.background_thread_stopped));
-            backgroundThread.quitSafely();
             try {
+                Log.d(TAG, getString(R.string.background_thread_stopped));
+                backgroundThread.quitSafely();
                 backgroundThread.join();
                 backgroundThread = null;
                 backgroundHandler = null;
