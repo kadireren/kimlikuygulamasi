@@ -1,61 +1,80 @@
 <resources>
-    <string name="app_name">kimlikuygulamasi</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
+    <string name="app_name">Kimlik Uygulaması</string>
+    <!-- MainActivity -->
 
-    <string name="lorem_ipsum">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
-        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
-        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
-        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
-        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
-        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
-        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
-        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
-        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
-        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
-        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
-        bibendum, vel congue leo egestas.\n\n
-        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
-        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
-        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
-        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
-        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
-        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
-        est.\n\n
-        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
-        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
-        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
-        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
-        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
-        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
-        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
-        convallis.\n\n
-        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
-        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
-        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
-        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
-        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
-        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
-        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
-    </string>
-    <string name="ki_isel_bilgiler_formu">Kişisel Bilgiler Formu</string>
-    <string name="kimlik_foto_raflar">Kimlik Fotoğrafları:</string>
-    <string name="ki_isel_bilgiler">Kişisel Bilgiler:</string>
-    <string name="ad_soyad">Ad Soyad</string>
-    <string name="tc_kimlik_no">TC Kimlik No</string>
-    <string name="do_um_tarihi_gg_aa_yyyy">Doğum Tarihi (GG.AA.YYYY)</string>
-    <string name="adres">Adres</string>
-    <string name="telefon">Telefon</string>
-    <string name="yazd_r">Yazdır</string>
-    <string name="kimlik_kart_kay_t_uygulamas">Kimlik Kartı Kayıt Uygulaması</string>
-    <string name="kimlik_n_y_z">Kimlik Ön Yüzü</string>
-    <string name="kimlik_arka_y_z">Kimlik Arka Yüzü</string>
-    <string name="forma_ge">Forma Geç</string>
-    <string name="nceki_ekimler">Önceki Çekimler</string>
-    <string name="l_tfen_nce_kimlik_kart_n_z_n_n_ve_arka_y_z_n_ekin_sonra_forma_ge_in">Lütfen önce kimlik kartınızın ön ve arka yüzünü çekin, sonra forma geçin.</string>
+    <string name="kimlik_uygulamas">Kimlik Uygulaması</string>
+    <string name="kimlik_on_saved">Kimlik ön yüzü kaydedildi</string>
+    <string name="kimlik_arka_saved">Kimlik arka yüzü kaydedildi</string>
+    <string name="kimlik_on_button_text">Kimlik Ön Yüzü (✓)</string>
+    <string name="kimlik_arka_button_text">Kimlik Arka Yüzü (✓)</string>
+    <string name="custom_camera_success">Kimlik fotoğrafları kılavuzla çekildi ve kırpıldı</string>
+    <string name="cekimler_placeholder">Çekimler özelliği geliştirme aşamasında</string>
+    <string name="camera_permission_granted">Kamera izni verildi</string>
+    <string name="form_error">Lütfen önce kimlik kartının her iki yüzünü çekin</string>
+    <string name="file_creation_error">Fotoğraf dosyası oluşturulamadı.</string>
+    <string name="kimlik_fotograflari">Kimlik Fotoğrafları</string>
+    <string name="btn_id_front">Kimlik Ön Yüzü</string>
+    <string name="btn_id_back">Kimlik Arka Yüzü</string>
+    <string name="btn_goto_form">Forma Geç</string>
+
+
+    <!-- Form Activity -->
+    <string name="form_title">Kişisel Bilgiler Formu</string>
+    <string name="form_id_photos">Kimlik Fotoğrafları</string>
+    <string name="form_personal_info">Kişisel Bilgiler</string>
+    <string name="form_full_name">Ad Soyad</string>
+    <string name="form_tc_no">T.C. Kimlik No</string>
+    <string name="form_birth_date">Doğum Tarihi</string>
+    <string name="form_address">Adres</string>
+    <string name="form_phone">Telefon</string>
+    <string name="form_print">Yazdır</string>
+    <string name="desc_id_front">Kimlik Ön Yüz</string>
+    <string name="desc_id_back">Kimlik Arka Yüz</string>
+
+    <!-- IdCardCameraActivity -->
+    <string name="kimlik_on_instruction">Kimliğinizin ön yüzünü beyaz bir zemin üzerinde çekin</string>
+    <string name="kimlik_arka_instruction">Kimliğinizin arka yüzünü beyaz bir zemin üzerinde çekin</string>
+    <string name="camera_permission_denied">Kamera izni verilmedi, uygulama çalışmayacak</string>
+    <string name="error_no_back_camera">Arka kamera bulunamadı</string>
+    <string name="error_camera_config">Kamera yapılandırması alınamadı</string>
+    <string name="error_camera_access">Kamera erişim hatası:</string>
+    <string name="camera_opened_successfully">Kamera başarıyla açıldı</string>
+    <string name="camera_disconnected">Kamera bağlantısı kesildi</string>
+    <string name="error_camera_open">Kamera açılırken hata oluştu:</string>
+    <string name="error_preview_texture">Önizleme için texture veya boyut yok</string>
+    <string name="camera_preview_configured">Kamera önizleme oturumu yapılandırıldı</string>
+    <string name="error_preview_configuration">Kamera önizleme oturumu yapılandırılamadı</string>
+    <string name="error_preview_creation">Kamera önizleme hatası:</string>
+    <string name="error_device_null">Kamera cihazı başlatılmadı</string>
+    <string name="camera_preview_updated">Kamera önizleme güncellendi</string>
+    <string name="error_preview_update">Kamera önizleme güncelleme hatası:</string>
+    <string name="error_saving_image">Fotoğraf kaydedilirken hata:</string>
+    <string name="photo_captured">Fotoğraf çekildi</string>
+    <string name="photo_saved">Fotoğraf kaydedildi:</string>
+    <string name="error_camera_capture">Kamera kayıt hatası:</string>
+    <string name="error_capture_session">Fotoğraf çekme oturumu oluşturulamadı</string>
+    <string name="error_taking_picture">Fotoğraf çekilirken hata:</string>
+    <string name="error_processing_image">Fotoğraf işlenirken hata:</string>
+    <string name="image_saved_successfully">Fotoğraf başarıyla kaydedildi:</string>
+    <string name="error_saving_image_file">Fotoğraf kaydedilirken hata:</string>
+    <string name="closing_camera">Kamera kapatılıyor</string>
+    <string name="background_thread_started">Arkaplan thread\'i başlatıldı</string>
+    <string name="background_thread_stopped">Arkaplan thread\'i durduruldu</string>
+    <string name="error_stopping_background">Arkaplan thread\'i durdurulurken hata:</string>
+    <string name="foto_raf_ek">Fotoğraf Çek</string>
+    <!-- PDFActivity -->
+    <string name="pdf_olu_turuldu">PDF Oluşturuldu</string>
     <string name="pdf_kaydet">PDF Kaydet</string>
     <string name="ana_sayfaya_d_n">Ana Sayfaya Dön</string>
-    <string name="pdf_olu_turuldu">PDF Oluşturuldu</string>
+    <string name="yazd_r">Yazdır</string>
+    <!-- MainActivity için eksik string kaynakları -->
+    <string name="error_getting_image_path">Resim yolu alınamadı</string>
+    <string name="camera_cancelled">Kamera işlemi iptal edildi</string>
+    <string name="error_camera_generic">Kamera hatası oluştu</string>
+    <string name="error_saving_cropped_image">Kırpılmış resim kaydedilemedi</string>
+    <string name="error_loading_image">Resim yüklenemedi</string>
+    <string name="form_validation_error">Lütfen tüm alanları doldurun</string>
+    <string name="crop_error_generic">Resim kırpılırken bir hata oluştu.</string>
+    <string name="crop_no_object_detected">Kimlik kartı algılanamadı, orijinal resim kullanılıyor.</string>
+    <string name="processing_image">Resim işleniyor...</string>
 </resources>

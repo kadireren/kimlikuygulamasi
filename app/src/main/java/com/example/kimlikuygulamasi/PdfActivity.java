@@ -19,9 +19,10 @@ import android.os.Environment;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,6 +34,7 @@ import java.util.Locale;
 public class PdfActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_STORAGE = 112;
+    private static final String TAG = "PdfActivity";
 
     private String adSoyad, tcNo, dogumTarihi, adres, telefon;
     private String kimlikOnUriString, kimlikArkaUriString;
@@ -130,7 +132,9 @@ public class PdfActivity extends AppCompatActivity {
                 canvas.drawBitmap(kimlikArka, 320, 100, null);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                String errorMsg = "Kimlik fotoğrafları yüklenirken hata: " + e.getMessage();
+                Log.e(TAG, errorMsg, e);
+                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -170,7 +174,10 @@ public class PdfActivity extends AppCompatActivity {
         // PDF dosyasını kaydet
         File pdfFolder = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "KimlikUygulamasi");
         if (!pdfFolder.exists()) {
-            pdfFolder.mkdirs();
+            boolean dirCreated = pdfFolder.mkdirs();
+            if (!dirCreated) {
+                Log.w(TAG, "PDF klasörü oluşturulamadı");
+            }
         }
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(System.currentTimeMillis());
@@ -179,15 +186,21 @@ public class PdfActivity extends AppCompatActivity {
         try {
             document.writeTo(new FileOutputStream(pdfDosyasi));
             Toast.makeText(this, "PDF oluşturuldu", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "PDF başarıyla oluşturuldu: " + pdfDosyasi.getAbsolutePath());
         } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "PDF oluşturulurken hata: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            String errorMsg = "PDF oluşturulurken hata: " + e.getMessage();
+            Log.e(TAG, errorMsg, e);
+            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
         }
 
         document.close();
     }
 
     private String[] formatText(String text) {
+        if (text == null) {
+            return new String[] { "" };
+        }
+
         if (text.length() <= 70) {
             return new String[] { text };
         }
@@ -215,9 +228,12 @@ public class PdfActivity extends AppCompatActivity {
             String jobName = getString(R.string.app_name) + " Kimlik Kayıt";
 
             printManager.print(jobName, printAdapter, new PrintAttributes.Builder().build());
+            Log.i(TAG, "PDF yazdırma işi başlatıldı");
 
         } catch (Exception e) {
-            Toast.makeText(this, "Yazdırma hatası: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            String errorMsg = "Yazdırma hatası: " + e.getMessage();
+            Log.e(TAG, errorMsg, e);
+            Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -231,8 +247,26 @@ public class PdfActivity extends AppCompatActivity {
 
         try {
             startActivity(intent);
+            Log.i(TAG, "PDF gösterici açıldı");
         } catch (Exception e) {
+            String errorMsg = "PDF gösterici uygulaması bulunamadı: " + e.getMessage();
+            Log.e(TAG, errorMsg, e);
             Toast.makeText(this, "PDF gösterici uygulaması bulunamadı", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_WRITE_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.i(TAG, "Depolama izni verildi");
+                createPdf();
+            } else {
+                String errorMsg = "PDF oluşturmak için depolama iznine ihtiyaç var";
+                Log.e(TAG, errorMsg);
+                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

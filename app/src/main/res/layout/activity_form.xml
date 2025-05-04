@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/ki_isel_bilgiler_formu"
+            android:text="@string/form_title"
             android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -27,8 +27,8 @@
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/kimlik_foto_raflar"
+            android:layout_marginTop="16dp"
+            android:text="@string/form_id_photos"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -39,30 +39,43 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView4">
 
-            <ImageView
-                android:id="@+id/img_kimlik_on"
+            <FrameLayout
                 android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="TODO"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_camera" />
+                android:layout_margin="8dp">
 
-            <ImageView
-                android:id="@+id/img_kimlik_arka"
+                <ImageView
+                    android:id="@+id/img_kimlik_on"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="#EEEEEE"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/desc_id_front" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="TODO"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_camera" />
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:id="@+id/img_kimlik_arka"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="#EEEEEE"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/desc_id_back" />
+            </FrameLayout>
         </LinearLayout>
 
         <TextView
@@ -70,19 +83,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/ki_isel_bilgiler"
+            android:text="@string/form_personal_info"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
+            android:id="@+id/tilAdSoyad"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/ad_soyad"
+            android:hint="@string/form_full_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5">
@@ -95,15 +108,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout2"
+            android:id="@+id/tilTcNo"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/tc_kimlik_no"
+            android:hint="@string/form_tc_no"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+            app:layout_constraintTop_toBottomOf="@+id/tilAdSoyad">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_tc_no"
@@ -114,15 +127,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout3"
+            android:id="@+id/tilDogumTarihi"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/do_um_tarihi_gg_aa_yyyy"
+            android:hint="@string/form_birth_date"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/tilTcNo">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_dogum_tarihi"
@@ -132,35 +145,34 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout4"
+            android:id="@+id/tilAdres"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/adres"
+            android:hint="@string/form_address"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+            app:layout_constraintTop_toBottomOf="@+id/tilDogumTarihi">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_adres"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top"
                 android:inputType="textMultiLine"
-                android:lines="3" />
+                android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout5"
+            android:id="@+id/tilTelefon"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/telefon"
+            android:hint="@string/form_phone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+            app:layout_constraintTop_toBottomOf="@+id/tilAdres">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_telefon"
@@ -174,10 +186,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="@string/yazd_r"
+            android:text="@string/form_print"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5" />
+            app:layout_constraintTop_toBottomOf="@+id/tilTelefon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

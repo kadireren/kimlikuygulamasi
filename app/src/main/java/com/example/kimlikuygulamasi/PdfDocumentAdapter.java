@@ -8,6 +8,7 @@ import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,25 +19,40 @@ import java.io.OutputStream;
 
 public class PdfDocumentAdapter extends PrintDocumentAdapter {
 
+    private static final String TAG = "PdfDocumentAdapter";
+    private final Context context;
     private final String filePath;
 
     public PdfDocumentAdapter(Context context, String filePath) {
+        this.context = context;
         this.filePath = filePath;
     }
 
     @Override
     public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
         if (cancellationSignal.isCanceled()) {
+            Log.d(TAG, "Yerleşim işlemi iptal edildi");
             callback.onLayoutCancelled();
             return;
         }
 
-        PrintDocumentInfo.Builder builder = new PrintDocumentInfo.Builder("file_name");
-        builder.setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
-                .setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN)
-                .build();
+        try {
+            File file = new File(filePath);
+            String fileName = file.getName();
 
-        callback.onLayoutFinished(builder.build(), !newAttributes.equals(oldAttributes));
+            PrintDocumentInfo.Builder builder = new PrintDocumentInfo.Builder(fileName);
+            builder.setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                    .setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN);
+
+            PrintDocumentInfo info = builder.build();
+
+            callback.onLayoutFinished(info, !newAttributes.equals(oldAttributes));
+            Log.d(TAG, "Yerleşim tamamlandı: " + fileName);
+        } catch (Exception e) {
+            String errorMsg = "Yerleşim oluşturulurken hata: " + e.getMessage();
+            Log.e(TAG, errorMsg, e);
+            callback.onLayoutFailed(errorMsg);
+        }
     }
 
     @Override
@@ -51,26 +67,36 @@ public class PdfDocumentAdapter extends PrintDocumentAdapter {
 
             byte[] buf = new byte[16384];
             int size;
+            int totalBytes = 0;
 
             while ((size = in.read(buf)) >= 0 && !cancellationSignal.isCanceled()) {
                 out.write(buf, 0, size);
+                totalBytes += size;
             }
 
             if (cancellationSignal.isCanceled()) {
+                Log.d(TAG, "Yazma işlemi iptal edildi");
                 callback.onWriteCancelled();
             } else {
                 callback.onWriteFinished(new PageRange[]{PageRange.ALL_PAGES});
+                Log.d(TAG, "Yazma tamamlandı: " + totalBytes + " byte");
             }
 
         } catch (Exception e) {
-            callback.onWriteFailed(e.getMessage());
-            e.printStackTrace();
+            String errorMsg = "PDF yazdırılırken hata: " + e.getMessage();
+            Log.e(TAG, errorMsg, e);
+            callback.onWriteFailed(errorMsg);
         } finally {
             try {
-                if (in != null) in.close();
-                if (out != null) out.close();
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                String errorMsg = "Stream kapatılırken hata: " + e.getMessage();
+                Log.e(TAG, errorMsg, e);
             }
         }
     }
