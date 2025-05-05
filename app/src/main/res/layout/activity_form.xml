@@ -1,195 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/form_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FormActivity">
+    android:padding="16dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/form_title"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/form_id_photos"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
+        <!-- Önizleme satırı -->
         <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:baselineAligned="false"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4">
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
-            <FrameLayout
+            <ImageView
+                android:id="@+id/iv_front"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp">
+                android:scaleType="centerCrop"
+                android:background="#EEE" />
 
-                <ImageView
-                    android:id="@+id/img_kimlik_on"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:background="#EEEEEE"
-                    android:scaleType="centerCrop"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/desc_id_front" />
-            </FrameLayout>
-
-            <FrameLayout
+            <ImageView
+                android:id="@+id/iv_back"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp">
-
-                <ImageView
-                    android:id="@+id/img_kimlik_arka"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:background="#EEEEEE"
-                    android:scaleType="centerCrop"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/desc_id_back" />
-            </FrameLayout>
+                android:scaleType="centerCrop"
+                android:background="#EEE"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
+        <!-- Kişisel Bilgiler -->
         <TextView
-            android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/form_personal_info"
-            android:textSize="18sp"
+            android:text="Kişisel Bilgiler"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAdSoyad"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/form_full_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5">
-
+            android:layout_marginBottom="12dp"
+            android:hint="Ad Soyad">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_ad_soyad"
+                android:id="@+id/et_full_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTcNo"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/form_tc_no"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilAdSoyad">
-
+            android:layout_marginBottom="24dp"
+            android:hint="T.C. Kimlik No">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_tc_no"
+                android:id="@+id/et_tc_no"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:maxLength="11" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDogumTarihi"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/form_birth_date"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilTcNo">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_dogum_tarihi"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="date" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAdres"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/form_address"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilDogumTarihi">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_adres"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:minLines="2" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTelefon"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="@string/form_phone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilAdres">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edt_telefon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="phone" />
-        </com.google.android.material.textfield.TextInputLayout>
-
+        <!-- Yazdır Butonu -->
         <Button
             android:id="@+id/btn_yazdir"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/form_print"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tilTelefon" />
+            android:text="YAZDIR"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@android:color/white" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </ScrollView>

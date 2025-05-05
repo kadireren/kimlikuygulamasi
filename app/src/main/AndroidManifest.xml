@@ -31,7 +31,7 @@
 
         <activity
             android:name=".IdCardCameraActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <activity android:name=".FormActivity" />

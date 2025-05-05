@@ -39,8 +39,9 @@ dependencies {
     implementation libs.camera.view
     implementation libs.core
 // PDF oluşturma için
-    implementation libs.itextpdf
+
     implementation libs.picasso
+    implementation libs.print
 // Material Design bileşenleri
     implementation libs.material.v140
     implementation libs.appcompat

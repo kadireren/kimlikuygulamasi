@@ -20,11 +20,9 @@ import java.io.OutputStream;
 public class PdfDocumentAdapter extends PrintDocumentAdapter {
 
     private static final String TAG = "PdfDocumentAdapter";
-    private final Context context;
     private final String filePath;
 
     public PdfDocumentAdapter(Context context, String filePath) {
-        this.context = context;
         this.filePath = filePath;
     }
 
