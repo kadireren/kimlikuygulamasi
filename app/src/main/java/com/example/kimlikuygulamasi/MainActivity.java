@@ -1,3 +1,4 @@
+// ✅ MainActivity.java (autoCrop kaldırıldı, gelen görüntü direk kullanılıyor)
 package com.example.kimlikuygulamasi;
 
 import android.Manifest;
@@ -9,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     handleImage(result.getData().getStringExtra("image_path"), true);
-                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                    Toast.makeText(this, R.string.camera_cancelled, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, R.string.error_camera_generic, Toast.LENGTH_SHORT).show();
                 }
@@ -50,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     handleImage(result.getData().getStringExtra("image_path"), false);
-                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                    Toast.makeText(this, R.string.camera_cancelled, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(this, R.string.error_camera_generic, Toast.LENGTH_SHORT).show();
                 }
@@ -106,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
         });
         btnToForm.setOnClickListener(v -> {
             Intent i = new Intent(this, FormActivity.class);
-            // Yeni key'ler FormActivity ile uyumlu
             i.putExtra("front_image_path", frontPath);
             i.putExtra("back_image_path",  backPath);
             startActivity(i);
@@ -120,42 +115,24 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.error_loading_image, Toast.LENGTH_SHORT).show();
             return;
         }
-        Bitmap cropped = autoCrop(bm);
-        String out = saveCropped(cropped, isFront);
+
+        String out = saveImage(bm, isFront);
         if (out == null) {
             Toast.makeText(this, R.string.error_saving_cropped_image, Toast.LENGTH_SHORT).show();
         } else {
             if (isFront) {
                 frontPath = out;
                 btnFront.setText(R.string.kimlik_on_button_text);
-                Toast.makeText(this, R.string.kimlik_on_saved, Toast.LENGTH_SHORT).show();
             } else {
                 backPath = out;
                 btnBack.setText(R.string.kimlik_arka_button_text);
-                Toast.makeText(this, R.string.kimlik_arka_saved, Toast.LENGTH_SHORT).show();
             }
         }
-        if (cropped != bm) bm.recycle();
+        bm.recycle();
         btnToForm.setEnabled(frontPath != null && backPath != null);
     }
 
-    private Bitmap autoCrop(Bitmap src) {
-        int w = src.getWidth(), h = src.getHeight();
-        float ratio = 85.6f/54f;
-        int tw, th;
-        if ((float)w/h > ratio) {
-            th = (int)(h*0.7f);
-            tw = (int)(th*ratio);
-        } else {
-            tw = (int)(w*0.85f);
-            th = (int)(tw/ratio);
-        }
-        int left = (w-tw)/2, top = (h-th)/2;
-        if (left<0||top<0||tw<=0||th<=0||left+tw>w||top+th>h) return src;
-        return Bitmap.createBitmap(src, left, top, tw, th);
-    }
-
-    private String saveCropped(Bitmap bmp, boolean front) {
+    private String saveImage(Bitmap bmp, boolean front) {
         String ts = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String name = (front?"CROPPED_FRONT_":"CROPPED_BACK_") + ts + "_";
         File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);

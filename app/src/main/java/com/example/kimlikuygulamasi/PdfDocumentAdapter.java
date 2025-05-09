@@ -1,6 +1,5 @@
 package com.example.kimlikuygulamasi;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
@@ -22,7 +21,7 @@ public class PdfDocumentAdapter extends PrintDocumentAdapter {
     private static final String TAG = "PdfDocumentAdapter";
     private final String filePath;
 
-    public PdfDocumentAdapter(Context context, String filePath) {
+    public PdfDocumentAdapter(String filePath) {
         this.filePath = filePath;
     }
 

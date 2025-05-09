@@ -3,6 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-
+    android:color="@color/guide_stroke_light"
     <!-- Android Studio'nun varsayılan olarak oluşturduğu diğer renkler de burada olabilir -->
 </resources>

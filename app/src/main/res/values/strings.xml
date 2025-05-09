@@ -15,28 +15,22 @@
     <string name="error_saving_cropped_image">Kırpılmış görüntü kaydedilemedi</string>
     <string name="error_loading_image">Resim yüklenemedi</string>
 
-    <!-- Form Activity -->
-    <string name="form_personal_info">Kişisel Bilgiler</string>
-    <string name="form_full_name">Ad Soyad</string>
-    <string name="form_tc_no">T.C. Kimlik No</string>
-    <string name="form_print">Yazdır</string>
+    <string-array name="document_types">
+        <item>Kimlik Kartı</item>
+        <item>Ehliyet</item>
+        <item>Pasaport</item>
+    </string-array>
 
     <!-- IdCardCameraActivity -->
-    <string name="kimlik_on_instruction">Kimliğinizin ön yüzünü beyaz bir zemin üzerinde çekin</string>
-    <string name="kimlik_arka_instruction">Kimliğinizin arka yüzünü beyaz bir zemin üzerinde çekin</string>
     <string name="camera_permission_denied">Kamera izni verilmedi, uygulama çalışmayacak</string>
-    <string name="error_no_back_camera">Arka kamera bulunamadı</string>
-    <string name="error_camera_config">Kamera yapılandırması alınamadı</string>
-    <string name="error_camera_access">Kamera erişim hatası:</string>
-    <string name="error_camera_open">Kamera açılırken hata oluştu:</string>
-    <string name="error_preview_configuration">Kamera önizleme oturumu yapılandırılamadı</string>
-    <string name="foto_raf_ek">Fotoğraf Çek</string>
 
     <!-- PDFActivity -->
     <string name="pdf_olu_turuldu">PDF Oluşturuldu</string>
     <string name="pdf_kaydet">PDF Kaydet</string>
     <string name="ana_sayfaya_d_n">Ana Sayfaya Dön</string>
     <string name="yazd_r">Yazdır</string>
-    <string name="ek">Çek</string>
+    <string name="yazdir">YAZDIR</string>
     <string name="t_c_kimlik_no">T.C. Kimlik No</string>
+    <string name="ad_soyad">Ad Soyad</string>
+    <string name="ki_isel_bilgiler">Kişisel Bilgiler</string>
 </resources>

@@ -1,8 +1,9 @@
 [versions]
-agp = "8.9.2"
+agp = "8.10.0"
 cameraCore = "1.4.2"
 compiler = "4.12.0"
 core = "1.16.0"
+exifinterface = "1.4.1"
 itextpdf = "5.5.13.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -26,6 +27,7 @@ camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = 
 camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCore" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
 core = { module = "androidx.core:core", version.ref = "core" }
+exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "compiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

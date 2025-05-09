@@ -38,6 +38,7 @@ dependencies {
     implementation libs.camera.lifecycle
     implementation libs.camera.view
     implementation libs.core
+    implementation libs.exifinterface
 // PDF oluşturma için
 
     implementation libs.picasso

@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <stroke
-        android:width="4dp"
-        android:color="#FFFFFF" />
-    <corners android:radius="8dp" />
-    <solid android:color="#20FFFFFF" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Arka plan (şeffaf gri) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#30FFFFFF" /> <!-- %30 opaklık -->
+            <corners android:radius="8dp" /> <!-- Köşe yuvarlaklığı -->
+        </shape>
+    </item>
+
+    <!-- Dış çerçeve (beyaz kalın çizgi) -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="4dp"
+                android:color="#FFFFFF" /> <!-- Beyaz çerçeve -->
+            <corners android:radius="8dp" />
+            <solid android:color="#00000000" /> <!-- Tam şeffaf -->
+        </shape>
+    </item>
+
+    <!-- İç kılavuz çizgileri (kesikli çizgiler) -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="2dp"
+                android:color="#CCFFFFFF"
+                android:dashWidth="8dp"
+                android:dashGap="4dp" /> <!-- Kesikli çizgi efekti -->
+            <corners android:radius="4dp" />
+            <solid android:color="#00000000" />
+            <padding
+                android:left="16dp"
+                android:top="16dp"
+                android:right="16dp"
+                android:bottom="16dp" />
+        </shape>
+    </item>
+</layer-list>

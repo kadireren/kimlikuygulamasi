@@ -36,7 +36,7 @@ public class PdfActivity extends AppCompatActivity {
     private static final int REQUEST_WRITE_STORAGE = 112;
     private static final String TAG = "PdfActivity";
 
-    private String adSoyad, tcNo, dogumTarihi, adres, telefon;
+    private String adSoyad, tcNo, dogumTarihi, dogumYeri, anneAdi, babaAdi, adres, telefon, meslek, email, belgeTuru;
     private String kimlikOnUriString, kimlikArkaUriString;
     private File pdfDosyasi;
 
@@ -54,8 +54,14 @@ public class PdfActivity extends AppCompatActivity {
             adSoyad = intent.getStringExtra("ad_soyad");
             tcNo = intent.getStringExtra("tc_no");
             dogumTarihi = intent.getStringExtra("dogum_tarihi");
+            dogumYeri = intent.getStringExtra("dogum_yeri");
+            anneAdi = intent.getStringExtra("anne_adi");
+            babaAdi = intent.getStringExtra("baba_adi");
             adres = intent.getStringExtra("adres");
             telefon = intent.getStringExtra("telefon");
+            meslek = intent.getStringExtra("meslek");
+            email = intent.getStringExtra("email");
+            belgeTuru = intent.getStringExtra("belge_turu");
             kimlikOnUriString = intent.getStringExtra("kimlik_on_uri");
             kimlikArkaUriString = intent.getStringExtra("kimlik_arka_uri");
         }
@@ -101,7 +107,7 @@ public class PdfActivity extends AppCompatActivity {
         Paint paint = new Paint();
 
         paint.setTextSize(16);
-        canvas.drawText("KİMLİK KAYIT FORMU", 250, 50, paint);
+        canvas.drawText("KİMLİK KAYIT FORMU", 200, 50, paint);
 
         if (kimlikOnUriString != null && kimlikArkaUriString != null) {
             try {
@@ -109,10 +115,10 @@ public class PdfActivity extends AppCompatActivity {
                 Bitmap kimlikArkaBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(Uri.parse(kimlikArkaUriString)));
 
                 if (kimlikOnBitmap != null) {
-                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikOnBitmap, 200, 120, false), 50, 100, paint);
+                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikOnBitmap, 200, 120, false), 50, 80, paint);
                 }
                 if (kimlikArkaBitmap != null) {
-                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikArkaBitmap, 200, 120, false), 300, 100, paint);
+                    canvas.drawBitmap(Bitmap.createScaledBitmap(kimlikArkaBitmap, 200, 120, false), 300, 80, paint);
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Kimlik fotoğrafları yüklenirken hata oluştu: " + e.getMessage(), e);
@@ -120,31 +126,30 @@ public class PdfActivity extends AppCompatActivity {
         }
 
         paint.setTextSize(14);
-        int y = 300;
+        int y = 230;
 
-        canvas.drawText("Ad Soyad: " + adSoyad, 50, y, paint);
-        y += 30;
+        canvas.drawText("Kimlik Belgesi Türü: " + belgeTuru, 50, y, paint); y += 20;
+        canvas.drawText("T.C. Kimlik No: " + tcNo, 50, y, paint); y += 20;
+        canvas.drawText("Ad Soyad: " + adSoyad, 50, y, paint); y += 20;
+        canvas.drawText("Doğum Tarihi: " + dogumTarihi, 50, y, paint); y += 20;
+        canvas.drawText("Doğum Yeri: " + dogumYeri, 50, y, paint); y += 20;
+        canvas.drawText("Anne Adı: " + anneAdi, 50, y, paint); y += 20;
+        canvas.drawText("Baba Adı: " + babaAdi, 50, y, paint); y += 20;
+        canvas.drawText("Telefon: " + telefon, 50, y, paint); y += 20;
+        canvas.drawText("Meslek: " + meslek, 50, y, paint); y += 20;
+        canvas.drawText("Email: " + email, 50, y, paint); y += 20;
 
-        canvas.drawText("TC Kimlik No: " + tcNo, 50, y, paint);
-        y += 30;
-
-        canvas.drawText("Doğum Tarihi: " + dogumTarihi, 50, y, paint);
-        y += 30;
-
-        canvas.drawText("Telefon: " + telefon, 50, y, paint);
-        y += 30;
-
-        canvas.drawText("Adres:", 50, y, paint);
-        y += 20;
-
-        String[] adresLines = formatText(adres);
-        for (String line : adresLines) {
+        canvas.drawText("Adres:", 50, y, paint); y += 20;
+        for (String line : formatText(adres)) {
             canvas.drawText(line, 70, y, paint);
             y += 20;
         }
 
         String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
         canvas.drawText("Tarih: " + currentDate, 50, y + 40, paint);
+        canvas.drawRect(350, y + 10, 545, y + 70, paint);
+        paint.setColor(0xFFFFFFFF);
+        canvas.drawText("İmza", 430, y + 45, paint);
 
         document.finishPage(page);
 
@@ -160,10 +165,8 @@ public class PdfActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(System.currentTimeMillis());
         pdfDosyasi = new File(pdfFolder, "Kimlik_" + timeStamp + ".pdf");
 
-        try {
-            FileOutputStream outputStream = new FileOutputStream(pdfDosyasi);
+        try (FileOutputStream outputStream = new FileOutputStream(pdfDosyasi)) {
             document.writeTo(outputStream);
-            outputStream.close();
             Log.d(TAG, "PDF başarıyla kaydedildi: " + pdfDosyasi.getAbsolutePath());
         } catch (IOException e) {
             Log.e(TAG, "PDF kaydedilirken hata oluştu: " + e.getMessage(), e);
@@ -174,31 +177,23 @@ public class PdfActivity extends AppCompatActivity {
     }
 
     private String[] formatText(String text) {
-        if (text == null) {
-            return new String[]{""};
-        }
-
-        if (text.length() <= 70) {
-            return new String[]{text};
-        }
+        if (text == null) return new String[]{""};
+        if (text.length() <= 70) return new String[]{text};
 
         int numLines = (int) Math.ceil((double) text.length() / 70);
         String[] lines = new String[numLines];
-
         for (int i = 0; i < numLines; i++) {
             int start = i * 70;
             int end = Math.min(start + 70, text.length());
             lines[i] = text.substring(start, end);
         }
-
         return lines;
     }
 
     private void printPdf() {
         PrintManager printManager = (PrintManager) getSystemService(PRINT_SERVICE);
-
         try {
-            PrintDocumentAdapter printAdapter = new PdfDocumentAdapter(this, pdfDosyasi.getAbsolutePath());
+            PrintDocumentAdapter printAdapter = new PdfDocumentAdapter(pdfDosyasi.getAbsolutePath());
             printManager.print("Kimlik PDF", printAdapter, null);
         } catch (Exception e) {
             Log.e(TAG, "PDF yazdırma hatası: " + e.getMessage(), e);
@@ -227,11 +222,9 @@ public class PdfActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.i(TAG, "Depolama izni verildi");
                 createPdf();
             } else {
-                Log.e(TAG, "PDF oluşturmak için depolama iznine ihtiyaç var");
-                Toast.makeText(this, "PDF oluşturmak için depolama iznine ihtiyaç var", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PDF oluşturmak için depolama izni gerekli", Toast.LENGTH_SHORT).show();
             }
         }
     }
